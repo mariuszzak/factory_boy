@@ -43,17 +43,27 @@ module FactoryBoy
   end
 
   class InstanceFactory
-    attr_accessor :schema, :default_values, :optional_klass
+    attr_accessor :default_values
 
     def initialize(schema, optional_klass, &block)
       @schema         = schema
       @optional_klass = optional_klass
       @default_values = {}
-      instance_eval &block if block_given?
+      build_default_values(&block) if block_given?
     end
 
     def build
       klass.new
+    end
+
+    private
+
+    attr_accessor :schema, :optional_klass
+
+    def build_default_values(&block)
+      default_values_builder = DefaultValuesBuilder.new
+      default_values_builder.instance_eval(&block)
+      @default_values = default_values_builder.instance_eval("@default_values")
     end
 
     def klass
@@ -65,11 +75,17 @@ module FactoryBoy
       end
     end
 
-    def method_missing(method_name, *args)
-      if !args.empty?
-        default_values[method_name] = args.first
-      else
-        super
+    class DefaultValuesBuilder
+      def initialize
+        @default_values = {}
+      end
+
+      def method_missing(method_name, *args)
+        if !args.empty?
+          @default_values[method_name] = args.first
+        else
+          super
+        end
       end
     end
   end

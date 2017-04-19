@@ -30,12 +30,30 @@ RSpec.describe FactoryBoy do
       end.not_to raise_exception
     end
 
-    it "raises an exception" do
+    it "raises an exception when argument is nighter a class nor a symbol" do
       expect do
         FactoryBoy.define_factory("user") do
           name "foobar"
         end
       end.to raise_exception FactoryBoy::SchemaNotSupported
+    end
+
+    it "allows to define an alias" do
+      expect do
+        FactoryBoy.define_factory(:admin, class: User) do
+          name "foobar"
+          admin true
+        end
+      end.not_to raise_exception
+    end
+
+    it "raises an exception if optional class is not a Class" do
+      expect do
+        FactoryBoy.define_factory(:admin, class: :user) do
+          name "foobar"
+          admin true
+        end
+      end.to raise_exception FactoryBoy::InvalidOptionalClass
     end
   end
 

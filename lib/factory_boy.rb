@@ -1,9 +1,10 @@
 require "factory_boy/version"
 
 module FactoryBoy
-  SchemaNotDefined   = Class.new(StandardError)
-  InvalidAttributes  = Class.new(StandardError)
-  SchemaNotSupported = Class.new(StandardError)
+  SchemaNotDefined     = Class.new(StandardError)
+  InvalidAttributes    = Class.new(StandardError)
+  SchemaNotSupported   = Class.new(StandardError)
+  InvalidOptionalClass = Class.new(StandardError)
   @factories = {}
 
   SUPPORTED_SCHEMA_TYPES = [Symbol, Class].freeze
@@ -15,9 +16,11 @@ module FactoryBoy
       self.factories = {}
     end
 
-    def define_factory(schema, &block)
+    def define_factory(schema, **opts, &block)
       validate_schema(schema)
-      factories[schema] = InstanceFactory.new(schema, &block)
+      optional_klass = opts[:class]
+      raise InvalidOptionalClass if optional_klass && !optional_klass.is_a?(Class)
+      factories[schema] = InstanceFactory.new(schema, optional_klass, &block)
     end
 
     def validate_schema(schema)
@@ -37,10 +40,11 @@ module FactoryBoy
   end
 
   class InstanceFactory
-    attr_accessor :schema, :default_values
+    attr_accessor :schema, :default_values, :optional_klass
 
-    def initialize(schema, &block)
+    def initialize(schema, optional_klass, &block)
       @schema         = schema
+      @optional_klass = optional_klass
       @default_values = {}
       instance_eval &block if block_given?
     end
@@ -50,9 +54,10 @@ module FactoryBoy
     end
 
     def klass
+      target_schema = optional_klass || schema
       case schema
-        when Symbol then Object.const_get(schema.capitalize)
-        when Class then schema
+        when Symbol then Object.const_get(target_schema.capitalize)
+        when Class then target_schema
         else raise SchemaNotSupported
       end
     end

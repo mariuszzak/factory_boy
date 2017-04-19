@@ -33,7 +33,21 @@ RSpec.describe FactoryBoy do
 
     context "schema is missing" do
       it "raises an exception" do
-        expect { FactoryBoy.build(User) }.to raise_exception FactoryBoy::SchemaNotDefined
+        expect do
+          FactoryBoy.build(User)
+        end.to raise_exception FactoryBoy::SchemaNotDefined
+      end
+    end
+
+    context "attributes are invalid" do
+      before do
+        FactoryBoy.define_factory(User)
+      end
+
+      it "raises an exception" do
+        expect do
+          FactoryBoy.build(User, invalid_attr: "foobar")
+        end.to raise_exception FactoryBoy::InvalidAttributes, "invalid_attr attribute is wrong"
       end
     end
   end

@@ -1,4 +1,4 @@
-require "factory_boy/version"
+require 'factory_boy/version'
 
 module FactoryBoy
   SchemaNotDefined     = Class.new(StandardError)
@@ -63,7 +63,7 @@ module FactoryBoy
     def build_default_values(&block)
       default_values_builder = DefaultValuesBuilder.new
       default_values_builder.instance_eval(&block)
-      @default_values = default_values_builder.instance_eval("@default_values")
+      @default_values = default_values_builder.instance_eval('@default_values')
     end
 
     def klass

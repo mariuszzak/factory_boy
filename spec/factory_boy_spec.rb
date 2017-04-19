@@ -1,22 +1,24 @@
 require 'spec_helper'
 
-class User
-  attr_accessor :name
-end
-
 RSpec.describe FactoryBoy do
   it 'has a version number' do
     expect(FactoryBoy::VERSION).not_to be nil
   end
 
+  let(:klass) do
+    Class.new do
+      attr_accessor :name
+    end
+  end
+
   describe '.define_factory' do
     it 'allows to define a schema' do
-      expect { FactoryBoy.define_factory(User) }.not_to raise_exception
+      expect { FactoryBoy.define_factory(klass) }.not_to raise_exception
     end
 
     it 'allows to pass a block with default attributes' do
       expect do
-        FactoryBoy.define_factory(User) do
+        FactoryBoy.define_factory(klass) do
           name 'foobar'
         end
       end.not_to raise_exception
@@ -40,7 +42,7 @@ RSpec.describe FactoryBoy do
 
     it 'allows to define an alias' do
       expect do
-        FactoryBoy.define_factory(:admin, class: User) do
+        FactoryBoy.define_factory(:admin, class: klass) do
           name 'foobar'
           admin true
         end
@@ -60,15 +62,15 @@ RSpec.describe FactoryBoy do
   describe '.build' do
     context 'schema is correctly defined by explicit class' do
       before do
-        FactoryBoy.define_factory(User)
+        FactoryBoy.define_factory(klass)
       end
 
-      it 'returns an instance of User class' do
-        expect(FactoryBoy.build(User)).to be_instance_of User
+      it 'returns an instance of given class' do
+        expect(FactoryBoy.build(klass)).to be_instance_of klass
       end
 
       it 'allows to pass optional attributes' do
-        instance = FactoryBoy.build(User, name: 'foobar')
+        instance = FactoryBoy.build(klass, name: 'foobar')
         expect(instance.name).to eq 'foobar'
       end
 
@@ -79,63 +81,64 @@ RSpec.describe FactoryBoy do
 
     context 'schema is defined with the block' do
       before do
-        FactoryBoy.define_factory(User) do
+        FactoryBoy.define_factory(klass) do
           name 'foobar'
         end
       end
 
-      it 'returns an instance of User class' do
-        expect(FactoryBoy.build(User)).to be_instance_of User
+      it 'returns an instance of given class' do
+        expect(FactoryBoy.build(klass)).to be_instance_of klass
       end
 
-      it 'reterun an instance of User class with default attributes' do
-        instance = FactoryBoy.build(User)
+      it 'reterun an instance of given class with default attributes' do
+        instance = FactoryBoy.build(klass)
         expect(instance.name).to eq 'foobar'
       end
 
       it 'allows to pass optional attributes' do
-        instance = FactoryBoy.build(User, name: 'baz')
+        instance = FactoryBoy.build(klass, name: 'baz')
         expect(instance.name).to eq 'baz'
       end
     end
 
     context 'schema is defined with the symbol' do
       before do
+        User = klass
         FactoryBoy.define_factory(:user) do
           name 'foobar'
         end
       end
 
-      it 'returns an instance of User class' do
-        expect(FactoryBoy.build(:user)).to be_instance_of User
+      it 'returns an instance of given class' do
+        expect(FactoryBoy.build(:user)).to be_instance_of klass
       end
 
-      it 'reterun an instance of User class with default attributes' do
+      it 'reterun an instance of given class with default attributes' do
         instance = FactoryBoy.build(:user)
         expect(instance.name).to eq 'foobar'
       end
 
       it 'raises an exception when you give a class instead of symbol' do
-        expect { FactoryBoy.build(User) }.to raise_exception FactoryBoy::SchemaNotDefined
+        expect { FactoryBoy.build(klass) }.to raise_exception FactoryBoy::SchemaNotDefined
       end
     end
 
     context 'schema is missing' do
       it 'raises an exception' do
         expect do
-          FactoryBoy.build(User)
+          FactoryBoy.build(klass)
         end.to raise_exception FactoryBoy::SchemaNotDefined
       end
     end
 
     context 'attributes are invalid' do
       before do
-        FactoryBoy.define_factory(User)
+        FactoryBoy.define_factory(klass)
       end
 
       it 'raises an exception' do
         expect do
-          FactoryBoy.build(User, invalid_attr: 'foobar')
+          FactoryBoy.build(klass, invalid_attr: 'foobar')
         end.to raise_exception FactoryBoy::InvalidAttributes, 'invalid_attr attribute is wrong'
       end
     end

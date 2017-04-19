@@ -43,7 +43,7 @@ module FactoryBoy
   end
 
   class InstanceFactory
-    attr_accessor :default_values
+    attr_reader :default_values
 
     def initialize(schema, optional_klass, &block)
       @schema         = schema

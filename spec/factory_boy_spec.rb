@@ -109,6 +109,10 @@ RSpec.describe FactoryBoy do
         end
       end
 
+      after do
+        Object.send(:remove_const, :User)
+      end
+
       it 'returns an instance of given class' do
         expect(FactoryBoy.build(:user)).to be_instance_of klass
       end

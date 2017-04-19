@@ -58,7 +58,7 @@ RSpec.describe FactoryBoy do
   end
 
   describe ".build" do
-    context "schema is correctly defined" do
+    context "schema is correctly defined by explicit class" do
       before do
         FactoryBoy.define_factory(User)
       end
@@ -70,6 +70,10 @@ RSpec.describe FactoryBoy do
       it "allows to pass optional attributes" do
         instance = FactoryBoy.build(User, name: "foobar")
         expect(instance.name).to eq "foobar"
+      end
+
+      it "raises an exception when you give a symbol instead of class" do
+        expect { FactoryBoy.build(:user) }.to raise_exception FactoryBoy::SchemaNotDefined
       end
     end
 
@@ -109,6 +113,10 @@ RSpec.describe FactoryBoy do
       it "reterun an instance of User class with default attributes" do
         instance = FactoryBoy.build(:user)
         expect(instance.name).to eq "foobar"
+      end
+
+      it "raises an exception when you give a class instead of symbol" do
+        expect { FactoryBoy.build(User) }.to raise_exception FactoryBoy::SchemaNotDefined
       end
     end
 

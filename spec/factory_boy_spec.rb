@@ -21,6 +21,22 @@ RSpec.describe FactoryBoy do
         end
       end.not_to raise_exception
     end
+
+    it "accepts a symbol as a first argument" do
+      expect do
+        FactoryBoy.define_factory(:user) do
+          name "foobar"
+        end
+      end.not_to raise_exception
+    end
+
+    it "raises an exception" do
+      expect do
+        FactoryBoy.define_factory("user") do
+          name "foobar"
+        end
+      end.to raise_exception FactoryBoy::SchemaNotSupported
+    end
   end
 
   describe ".build" do
@@ -58,6 +74,23 @@ RSpec.describe FactoryBoy do
       it "allows to pass optional attributes" do
         instance = FactoryBoy.build(User, name: "baz")
         expect(instance.name).to eq "baz"
+      end
+    end
+
+    context "schema is defined with the symbol" do
+      before do
+        FactoryBoy.define_factory(:user) do
+          name "foobar"
+        end
+      end
+
+      it "returns an instance of User class" do
+        expect(FactoryBoy.build(:user)).to be_instance_of User
+      end
+
+      it "reterun an instance of User class with default attributes" do
+        instance = FactoryBoy.build(:user)
+        expect(instance.name).to eq "foobar"
       end
     end
 

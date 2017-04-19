@@ -1,4 +1,4 @@
-require 'factory_boy/instance_factory_builder'
+require 'factory_boy/default_values_builder'
 
 module FactoryBoy
   class InstanceFactory

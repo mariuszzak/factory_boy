@@ -5,13 +5,12 @@ module FactoryBoy
   InvalidAttributes    = Class.new(StandardError)
   SchemaNotSupported   = Class.new(StandardError)
   InvalidOptionalClass = Class.new(StandardError)
-  @factories = {}
 
   SUPPORTED_SCHEMA_TYPES = [Symbol, Class].freeze
 
-  class << self
-    attr_accessor :factories
+  @factories = {}
 
+  class << self
     def reset_factories
       self.factories = {}
     end
@@ -23,10 +22,6 @@ module FactoryBoy
       factories[schema] = InstanceFactory.new(schema, optional_klass, &block)
     end
 
-    def validate_schema(schema)
-      raise SchemaNotSupported unless SUPPORTED_SCHEMA_TYPES.include?(schema.class)
-    end
-
     def build(schema, **attrs)
       factory = factories[schema]
       raise SchemaNotDefined unless factory
@@ -36,6 +31,14 @@ module FactoryBoy
           instance.public_send("#{key}=", val)
         end
       end
+    end
+
+    private
+
+    attr_accessor :factories
+
+    def validate_schema(schema)
+      raise SchemaNotSupported unless SUPPORTED_SCHEMA_TYPES.include?(schema.class)
     end
   end
 

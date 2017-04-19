@@ -60,7 +60,7 @@ RSpec.describe FactoryBoy do
   end
 
   describe '.build' do
-    context 'schema is correctly defined by explicit class' do
+    context 'schema is correctly defined for explicit class' do
       before do
         FactoryBoy.define_factory(klass)
       end
@@ -113,7 +113,7 @@ RSpec.describe FactoryBoy do
         expect(FactoryBoy.build(:user)).to be_instance_of klass
       end
 
-      it 'reterun an instance of given class with default attributes' do
+      it 'returns an instance of given class with default attributes' do
         instance = FactoryBoy.build(:user)
         expect(instance.name).to eq 'foobar'
       end
@@ -123,10 +123,16 @@ RSpec.describe FactoryBoy do
       end
     end
 
-    context 'schema is missing' do
-      it 'raises an exception' do
+    context 'schema is undefined' do
+      it 'raises an exception for an explicit class' do
         expect do
           FactoryBoy.build(klass)
+        end.to raise_exception FactoryBoy::SchemaNotDefined
+      end
+
+      it 'raises an exception for a symbol' do
+        expect do
+          FactoryBoy.build(:foo)
         end.to raise_exception FactoryBoy::SchemaNotDefined
       end
     end

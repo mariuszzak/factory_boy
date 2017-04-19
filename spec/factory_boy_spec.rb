@@ -13,6 +13,14 @@ RSpec.describe FactoryBoy do
     it "allows to define a schema" do
       expect { FactoryBoy.define_factory(User) }.not_to raise_exception
     end
+
+    it "allows to pass a block with default attributes" do
+      expect do
+        FactoryBoy.define_factory(User) do
+          name "foobar"
+        end
+      end.not_to raise_exception
+    end
   end
 
   describe ".build" do
@@ -28,6 +36,28 @@ RSpec.describe FactoryBoy do
       it "allows to pass optional attributes" do
         instance = FactoryBoy.build(User, name: "foobar")
         expect(instance.name).to eq "foobar"
+      end
+    end
+
+    context "schema is defined with the block" do
+      before do
+        FactoryBoy.define_factory(User) do
+          name "foobar"
+        end
+      end
+
+      it "returns an instance of User class" do
+        expect(FactoryBoy.build(User)).to be_instance_of User
+      end
+
+      it "reterun an instance of User class with default attributes" do
+        instance = FactoryBoy.build(User)
+        expect(instance.name).to eq "foobar"
+      end
+
+      it "allows to pass optional attributes" do
+        instance = FactoryBoy.build(User, name: "baz")
+        expect(instance.name).to eq "baz"
       end
     end
 

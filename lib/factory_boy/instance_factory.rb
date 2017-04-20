@@ -27,7 +27,7 @@ module FactoryBoy
 
     def klass
       target_schema = optional_klass || schema
-      case schema
+      case target_schema
         when Symbol then Object.const_get(target_schema.capitalize)
         when Class then target_schema
         else raise SchemaNotSupported

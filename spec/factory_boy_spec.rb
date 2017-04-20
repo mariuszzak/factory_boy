@@ -127,6 +127,32 @@ RSpec.describe FactoryBoy do
       end
     end
 
+    context 'schema is defined with the alias' do
+      before do
+        User = klass
+        FactoryBoy.define_factory(:admin, class: klass) do
+          name 'foobar'
+        end
+      end
+
+      after do
+        Object.send(:remove_const, :User)
+      end
+
+      it 'returns an instance of given class' do
+        expect(FactoryBoy.build(:admin)).to be_instance_of klass
+      end
+
+      it 'returns an instance of given class with default attributes' do
+        instance = FactoryBoy.build(:admin)
+        expect(instance.name).to eq 'foobar'
+      end
+
+      it 'raises an exception when you give a class instead of symbol' do
+        expect { FactoryBoy.build(klass) }.to raise_exception FactoryBoy::SchemaNotDefined
+      end
+    end
+
     context 'schema is undefined' do
       it 'raises an exception for an explicit class' do
         expect do

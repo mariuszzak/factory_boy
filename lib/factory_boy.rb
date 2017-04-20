@@ -27,10 +27,7 @@ module FactoryBoy
       factory = factories[schema]
       raise SchemaNotDefined unless factory
       factory.build.tap do |instance|
-        factory.default_values.merge(attrs).each do |key, val|
-          raise InvalidAttributes.new("#{key} attribute is wrong") unless instance.respond_to?("#{key}=")
-          instance.public_send("#{key}=", val)
-        end
+        set_instance_attributes(instance, factory.default_values.merge(attrs))
       end
     end
 
@@ -40,6 +37,13 @@ module FactoryBoy
 
     def validate_schema(schema)
       raise SchemaNotSupported unless SUPPORTED_SCHEMA_TYPES.include?(schema.class)
+    end
+
+    def set_instance_attributes(instance, attrs)
+      attrs.each do |key, val|
+        raise InvalidAttributes.new("#{key} attribute is wrong") unless instance.respond_to?("#{key}=")
+        instance.public_send("#{key}=", val)
+      end
     end
   end
 end

@@ -1,5 +1,5 @@
 module FactoryBoy
-  class DefaultValuesBuilder
+  class DefaultValuesBuilder < BasicObject
     def initialize
       @default_values = {}
     end

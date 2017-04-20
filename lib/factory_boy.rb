@@ -40,9 +40,9 @@ module FactoryBoy
     end
 
     def set_instance_attributes(instance, attrs)
-      attrs.each do |key, val|
-        raise InvalidAttributes.new("#{key} attribute is wrong") unless instance.respond_to?("#{key}=")
-        instance.public_send("#{key}=", val)
+      attrs.each do |attr_name, val|
+        raise InvalidAttributes.new("#{attr_name} attribute is wrong") unless instance.respond_to?("#{attr_name}=")
+        instance.public_send("#{attr_name}=", val)
       end
     end
   end
